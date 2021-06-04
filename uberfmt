@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+
+import sys
+import subprocess
+import re
+
+goalw = 62
+maxw = 72
+
+def fmt(prefix, lines, goalw, maxw):
+    output = subprocess.check_output(
+        ["fmt", "-g", str(goalw), "-w", str(maxw)],
+        encoding="utf-8", input="\n".join(lines))
+    for i, line in enumerate(output.splitlines()):
+        print(prefix[min(i, len(prefix)-1)] + line)
+
+rx_line = re.compile("^([ #/(*)-]*)(.*)$")
+
+current_paragraph = []
+current_prefix = []
+for line in sys.stdin:
+    prefix, line = rx_line.match(line).groups()
+    if line == "":
+        if current_paragraph:
+            fmt(current_prefix, current_paragraph, goalw - len(current_prefix[0]), maxw - len(current_prefix[0]))
+        print(prefix)
+        current_paragraph = []
+        current_prefix = []
+    else:
+        if current_prefix == [] or len(current_prefix[0]) != len(prefix):
+            if current_paragraph:
+                fmt(current_prefix, current_paragraph, goalw - len(current_prefix[0]), maxw - len(current_prefix[0]))
+            current_paragraph = []
+            current_prefix = []
+        current_paragraph.append(line)
+        current_prefix.append(prefix)
+if current_paragraph:
+    fmt(current_prefix, current_paragraph, goalw - len(current_prefix[0]), maxw - len(current_prefix[0]))
