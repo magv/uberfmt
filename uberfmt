@@ -10,7 +10,7 @@ def fmt_words(prefix, words, goalw):
     cache = [None] * len(spansum)
     def best_breaks(i0):
         if cache[i0] is None:
-            bestscore = (spansum[i0] - 1 - goalw)**2
+            bestscore = (max(0, spansum[i0] - 1 - goalw))**2
             bestbreaks = []
             for i in range(i0 + 1, len(words)):
                 score, breaks = best_breaks(i)
