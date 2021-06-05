@@ -1,38 +1,56 @@
 #!/usr/bin/env python3
 
-import sys
-import subprocess
 import re
+import sys
 
-goalw = 62
-maxw = 72
+def fmt_words(prefix, words, goalw):
+    spans = [len(w) + 1 for w in words]
+    cache = [None] * len(spans)
+    def best_breaks(i0):
+        if cache[i0] is None:
+            bestscore = (sum(spans[i0:]) - 1 - goalw)**2
+            bestbreaks = []
+            for i in range(i0 + 1, len(words)):
+                score, breaks = best_breaks(i)
+                score += (sum(spans[i0:i]) - 1 - goalw)**2
+                if score <= bestscore:
+                    bestscore = score
+                    bestbreaks = [i] + breaks
+            cache[i0] = (bestscore, bestbreaks)
+        return cache[i0]
+    score, breaks = best_breaks(0)
+    breaks.append(len(words))
+    idx = 0
+    for i, br in enumerate(breaks):
+        print(prefix[min(i, len(prefix) - 1)] + " ".join(words[idx:br]))
+        idx = br
 
-def fmt(prefix, lines, goalw, maxw):
-    output = subprocess.check_output(
-        ["fmt", "-g", str(goalw), "-w", str(maxw)],
-        encoding="utf-8", input="\n".join(lines))
-    for i, line in enumerate(output.splitlines()):
-        print(prefix[min(i, len(prefix)-1)] + line)
+def fmt_lines(prefix, lines, goalw):
+    words = [word for line in lines for word in line.split()]
+    fmt_words(prefix, words, goalw)
 
-rx_line = re.compile("^([ #/(*)-]*)(.*)$")
-
-current_paragraph = []
-current_prefix = []
-for line in sys.stdin:
-    prefix, line = rx_line.match(line).groups()
-    if line == "":
-        if current_paragraph:
-            fmt(current_prefix, current_paragraph, goalw - len(current_prefix[0]), maxw - len(current_prefix[0]))
-        print(prefix)
-        current_paragraph = []
-        current_prefix = []
-    else:
-        if current_prefix == [] or len(current_prefix[0]) != len(prefix):
+def fmt_file(f, goalw):
+    rx_line = re.compile("^([ #/(*)-]*)(.*)$")
+    current_paragraph = []
+    current_prefix = []
+    for line in f:
+        prefix, line = rx_line.match(line).groups()
+        if line == "":
             if current_paragraph:
-                fmt(current_prefix, current_paragraph, goalw - len(current_prefix[0]), maxw - len(current_prefix[0]))
+                fmt_lines(current_prefix, current_paragraph, goalw - len(current_prefix[0]))
+            print(prefix)
             current_paragraph = []
             current_prefix = []
-        current_paragraph.append(line)
-        current_prefix.append(prefix)
-if current_paragraph:
-    fmt(current_prefix, current_paragraph, goalw - len(current_prefix[0]), maxw - len(current_prefix[0]))
+        else:
+            if current_prefix == [] or len(current_prefix[0]) != len(prefix):
+                if current_paragraph:
+                    fmt_lines(current_prefix, current_paragraph, goalw - len(current_prefix[0]))
+                current_paragraph = []
+                current_prefix = []
+            current_paragraph.append(line)
+            current_prefix.append(prefix)
+    if current_paragraph:
+        fmt_lines(current_prefix, current_paragraph, goalw - len(current_prefix[0]))
+
+if __name__ == "__main__":
+    fmt_file(sys.stdin, 62)
