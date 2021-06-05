@@ -2,10 +2,15 @@
 
 import re
 import sys
-import wcwidth
+
+try:
+    from wcwidth import wcswidth
+except ImportError:
+    def wcswidth(text):
+        return len(text)
 
 def fmt_words(prefix, words, goalw):
-    spans = [wcwidth.wcswidth(w) + 1 for w in words]
+    spans = [wcswidth(w) + 1 for w in words]
     spansum = [sum(spans[i:]) for i in range(len(spans))]
     cache = [None] * len(spansum)
     def best_breaks(i0):
@@ -54,5 +59,8 @@ def fmt_file(f, goalw):
     if current_paragraph:
         fmt_lines(current_prefix, current_paragraph, goalw - len(current_prefix[0]))
 
-if __name__ == "__main__":
+def main():
     fmt_file(sys.stdin, 62)
+
+if __name__ == "__main__":
+    main()
