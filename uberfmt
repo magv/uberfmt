@@ -6,14 +6,15 @@ import wcwidth
 
 def fmt_words(prefix, words, goalw):
     spans = [wcwidth.wcswidth(w) + 1 for w in words]
-    cache = [None] * len(spans)
+    spansum = [sum(spans[i:]) for i in range(len(spans))]
+    cache = [None] * len(spansum)
     def best_breaks(i0):
         if cache[i0] is None:
-            bestscore = (sum(spans[i0:]) - 1 - goalw)**2
+            bestscore = (spansum[i0] - 1 - goalw)**2
             bestbreaks = []
             for i in range(i0 + 1, len(words)):
                 score, breaks = best_breaks(i)
-                score += (sum(spans[i0:i]) - 1 - goalw)**2
+                score += (spansum[i0] - spansum[i] - 1 - goalw)**2
                 if score <= bestscore:
                     bestscore = score
                     bestbreaks = [i] + breaks
