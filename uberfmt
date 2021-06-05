@@ -2,9 +2,10 @@
 
 import re
 import sys
+import wcwidth
 
 def fmt_words(prefix, words, goalw):
-    spans = [len(w) + 1 for w in words]
+    spans = [wcwidth.wcswidth(w) + 1 for w in words]
     cache = [None] * len(spans)
     def best_breaks(i0):
         if cache[i0] is None:
