@@ -41,7 +41,16 @@ fragment of text) will reformat it with `uberfmt`.
 
 # How to install?
 
-Just download [uberfmt] from Github; it’s a single file program.
+Install it from [PyPI]:
+
+    python3 -m pip install --user --upgrade uberfmt
+
+This should place a small script into your `~/.local/bin` folder,
+and if it is in your `PATH`, you should be able to use `uberfmt`
+right away.
+
+Alternatively just download [uberfmt] from Github; it’s a single
+file program.
     
 [pypi]: https://pypi.org/project/uberfmt/
 [uberfmt]: https://raw.githubusercontent.com/magv/uberfmt/master/uberfmt
