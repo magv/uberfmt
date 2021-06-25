@@ -4,7 +4,7 @@ import setuptools
 
 setuptools.setup(
     name="uberfmt",
-    version="0.1",
+    version="0.2",
     url="https://github.com/magv/uberfmt",
     author="Vitaly Magerya",
     description="Format paragraphs of text, inside or outside of source code comments",

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import getopt
 import re
 import sys
 
@@ -59,8 +60,21 @@ def fmt_file(f, goalw):
     if current_paragraph:
         fmt_lines(current_prefix, current_paragraph, goalw - len(current_prefix[0]))
 
+def usage():
+    print("usage:", sys.argv[0], "[-h] [-g goal-width] [file ...]")
+
 def main():
-    fmt_file(sys.stdin, 62)
+    goalw = 62
+    opts, args = getopt.gnu_getopt(sys.argv[1:], "hg:")
+    for opt, val in opts:
+        if opt == "-g": goalw = int(val)
+        if opt == "-h": usage(); return
+    if args == []:
+        fmt_file(sys.stdin, goalw)
+    else:
+        for file in args:
+            with open(file, "r") as f:
+                fmt_file(f, goalw)
 
 if __name__ == "__main__":
     main()
