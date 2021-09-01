@@ -38,7 +38,7 @@ def fmt_lines(prefix, lines, goalw):
     fmt_words(prefix, words, goalw)
 
 def fmt_file(f, goalw):
-    rx_line = re.compile("^([ #/(*)-]*)(.*)$")
+    rx_line = re.compile(r"^([ \t#/(*)-]*)(.*)$")
     current_paragraph = []
     current_prefix = []
     for line in f:
